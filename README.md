@@ -18,12 +18,12 @@ It features a **Dual-Layer Intelligence System**:
 ### 1. The Strategic Executive View
 *Designed for Directors to monitor high-level KPIs, budget utilization ($626K), and overall retention rates (94%).*
 
-![**[<img width="1486" height="782" alt="image" src="https://github.com/user-attachments/assets/b79d1f76-e072-41fe-8c2a-1b2c8be34a7d" />](path/to/dashboard1.png)
+<img width="1486" height="782" alt="image" src="https://github.com/user-attachments/assets/b79d1f76-e072-41fe-8c2a-1b2c8be34a7d" />
 
 ### 2. The Operational Action Board
 *Designed for Case Managers. Features a "Risk vs. Investment" scatter plot and a prioritized action list for 85 critical cases.*
 
-![**[<img width="1481" height="781" alt="image" src="https://github.com/user-attachments/assets/bff5a440-5fdc-4323-b23b-c8737016f4e5" />]**](path/to/dashboard2.png)
+<img width="1481" height="781" alt="image" src="https://github.com/user-attachments/assets/55745e8c-d9da-4535-a092-ad761d7a63fa" />
 
 ---
 
