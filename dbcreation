@@ -1,0 +1,36 @@
+-- 1. Create the Database
+CREATE DATABASE IF NOT EXISTS program_impact_db;
+USE program_impact_db;
+
+-- 2. Create the Beneficiaries Table (Master Table)
+-- This holds the demographic info.
+CREATE TABLE IF NOT EXISTS raw_beneficiaries (
+    Beneficiary_ID VARCHAR(20) PRIMARY KEY, -- e.g., 'ZHI-10001'
+    District VARCHAR(50),
+    Age_Group VARCHAR(10),
+    Enrollment_Date DATE,
+    Vulnerability_Score INT -- Scale 1-10
+);
+
+-- 3. Create the Interventions Log Table (Transactional Table)
+-- This records every service provided. One beneficiary can have many rows here.
+CREATE TABLE IF NOT EXISTS raw_interventions (
+    Intervention_ID INT AUTO_INCREMENT PRIMARY KEY, -- Unique ID for the log entry
+    Beneficiary_ID VARCHAR(20),
+    Intervention_Type VARCHAR(100), -- e.g., 'Economic Strengthening'
+    Date_Provided DATE,
+    Cost_USD DECIMAL(10, 2), -- Handling currency with precision
+    FOREIGN KEY (Beneficiary_ID) REFERENCES raw_beneficiaries(Beneficiary_ID)
+);
+
+-- 4. Create the Impact Outcomes Table (Performance Table)
+-- This holds the 'Before vs. After' comparison data.
+CREATE TABLE IF NOT EXISTS raw_impact_outcomes (
+    Beneficiary_ID VARCHAR(20) PRIMARY KEY,
+    Baseline_HIV_Risk INT, -- Score 0-100
+    Endline_HIV_Risk INT, -- Score 0-100
+    Baseline_Attendance DECIMAL(5, 2), -- e.g., 0.75 for 75%
+    Endline_Attendance DECIMAL(5, 2),
+    Program_Status VARCHAR(20), -- 'Active', 'Graduated', 'Dropped Out'
+    FOREIGN KEY (Beneficiary_ID) REFERENCES raw_beneficiaries(Beneficiary_ID)
+);

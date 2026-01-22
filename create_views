@@ -1,0 +1,65 @@
+-- File: create_views/view_intervention_summary.sql
+-- The interventions table has multiple rows per person (One-to-Many). 
+-- The Solution: We need to "squash" (aggregate) this down so we have one row per beneficiary with their total stats.
+
+CREATE OR REPLACE VIEW view_intervention_summary AS
+SELECT 
+    Beneficiary_ID,
+    COUNT(Intervention_ID) AS Total_Interventions,
+    SUM(Cost_USD) AS Total_Investment_USD,
+    -- Pivot Logic: Creating flags for specific interventions (Crucial for Analysis)
+    MAX(CASE WHEN Intervention_Type = 'Education Support' THEN 1 ELSE 0 END) AS Has_Education_Support,
+    MAX(CASE WHEN Intervention_Type = 'Economic Strengthening' THEN 1 ELSE 0 END) AS Has_Economic_Support,
+    MAX(CASE WHEN Intervention_Type = 'Clinical Services' THEN 1 ELSE 0 END) AS Has_Clinical_Services,
+    MAX(CASE WHEN Intervention_Type = 'SGBV Prevention' THEN 1 ELSE 0 END) AS Has_SGBV_Prevention
+FROM 
+    raw_interventions
+GROUP BY 
+    Beneficiary_ID;
+
+
+
+-- File: create_views/view_master_analytics.sql
+-- This is the Master View that combines Beneficiaries, Interventions Summary, and Impact Outcomes.
+
+CREATE OR REPLACE VIEW view_master_analytics AS
+SELECT 
+    -- 1. Demographic Info
+    b.Beneficiary_ID,
+    b.District,
+    b.Age_Group,
+    b.Vulnerability_Score,
+    
+    -- 2. Cleaning / Transformation: Categorize Vulnerability
+    CASE 
+        WHEN b.Vulnerability_Score >= 8 THEN 'Critical'
+        WHEN b.Vulnerability_Score >= 5 THEN 'Moderate'
+        ELSE 'Stable' 
+    END AS Vulnerability_Category,
+    
+    -- 3. Intervention Metrics (Handling NULLs with COALESCE)
+    -- If a person had NO interventions, the View returns NULL. We turn that into 0.
+    COALESCE(i.Total_Interventions, 0) AS Total_Interventions,
+    COALESCE(i.Total_Investment_USD, 0) AS Total_Investment_USD,
+    COALESCE(i.Has_Education_Support, 0) AS Has_Education_Support,
+    COALESCE(i.Has_Economic_Support, 0) AS Has_Economic_Support,
+    COALESCE(i.Has_Clinical_Services, 0) AS Has_Clinical_Services,
+    
+    -- 4. Impact Outcomes
+    o.Baseline_HIV_Risk,
+    o.Endline_HIV_Risk,
+    o.Baseline_Attendance,
+    o.Endline_Attendance,
+    o.Program_Status,
+    
+    -- 5. Calculated KPIs (Feature Engineering in SQL!)
+    (o.Baseline_HIV_Risk - o.Endline_HIV_Risk) AS Risk_Reduction_Score,
+    (o.Endline_Attendance - o.Baseline_Attendance) AS Attendance_Improvement
+    
+FROM 
+    raw_beneficiaries b
+-- LEFT JOIN ensures we keep all beneficiaries, even if they have no interventions yet
+LEFT JOIN 
+    view_intervention_summary i ON b.Beneficiary_ID = i.Beneficiary_ID
+LEFT JOIN 
+    raw_impact_outcomes o ON b.Beneficiary_ID = o.Beneficiary_ID;

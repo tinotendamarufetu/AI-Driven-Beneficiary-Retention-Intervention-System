@@ -1,0 +1,20 @@
+LOAD DATA INFILE 'C:\Users\tinot\Desktop\Projects\Program Impact Analysis Project\data\beneficiaries.csv' 
+INTO TABLE raw_beneficiaries 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS; -- Skips the header row
+
+LOAD DATA INFILE 'C:/Users/tinot/Desktop/Projects/Program Impact Analysis Project/data/interventions.csv' 
+INTO TABLE raw_interventions 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS; -- Skips the header row
+
+LOAD DATA INFILE 'C:\Users\tinot\Desktop\Projects\Program Impact Analysis Project\data\impact_outcomes.csv' 
+INTO TABLE raw_impact_outcomes 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS; -- Skips the header row
